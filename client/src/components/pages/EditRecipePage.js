@@ -31,8 +31,8 @@ const EditRecipePage = () => {
   const [formData, setFormData] = useState({
     recipeName: "",
     servingSize: "",
-    prepTime: "mins",
-    prepTimeUnit: "",
+    prepTime: "",
+    prepTimeUnit: "mins",
     cookTime: "",
     cookTimeUnit: "mins",
     tags: [], //contain tags id
@@ -172,32 +172,35 @@ const EditRecipePage = () => {
     const checkedTags = initialState.tags.map((tag) => {
       return tag.tagName;
     });
+
     const checkChecked = (tag) => {
       return checkedTags.includes(tag);
     };
     const currentAvailableTags = [...availableTags];
+
     setAvailableTags(
       currentAvailableTags.map((tag) => {
-        return { ...tag, checked: checkChecked(tag) };
+        return { ...tag, checked: checkChecked(tag.tagName) };
       })
     );
 
     //reset ingredients selected
-    setSelectedIngredients(initialState.ingredientList);
+    const ingredientList = initialState.ingredientList;
+    // console.log("ingredient list", ingredientList);
+    const selectedIng = ingredientList.map((ingredient) => {
+      const filter = availableIngredients.filter((ing) => {
+        return ing.ingredientName === ingredient.ingredient.ingredientName;
+      });
+
+      return { ...ingredient, unitOptions: filter[0].units };
+    });
+
+    setSelectedIngredients(selectedIng);
 
     //reset cooking instruction
     setCookingInstructions(initialState.instructions);
     setFormData(initialState);
   };
-
-  // const capitalizeName = (str) => {
-  //   const splitStr = str.toLowerCase().split(" ");
-  //   for (let i = 0; i < splitStr.length; i++) {
-  //     splitStr[i] =
-  //       splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
-  //   }
-  //   return splitStr.join(" ");
-  // };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -338,6 +341,7 @@ const EditRecipePage = () => {
               <Form.Control
                 as="select"
                 onChange={(event) => handleSelect(event)}
+                value={formData.prepTimeUnit}
               >
                 <option value="mins">mins</option>
                 <option value="hours">hours</option>
@@ -361,6 +365,7 @@ const EditRecipePage = () => {
               <Form.Control
                 as="select"
                 onChange={(event) => handleSelect(event)}
+                value={formData.cookTimeUnit}
               >
                 <option value="mins">mins</option>
                 <option value="hours">hours</option>
